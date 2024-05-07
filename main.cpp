@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <unordered_map>
 #include <vector>
 #include <algorithm>
@@ -19,9 +20,10 @@ unordered_map<string, Player> load_players() {
     ifstream file("players.txt");
     string line;
     while (getline(file, line)) {
+        stringstream ss(line);
         string player_id;
         char sign;
-        file >> player_id >> sign;
+        ss >> player_id >> sign;
         players[player_id] = {sign, 0, 0, 0, 0};
     }
     return players;
@@ -33,21 +35,24 @@ void load_results(unordered_map<string, Player>& players) {
     while (getline(file, line)) {
         char winner_id = line[0];
         char loser_id = line[1];
-        if (winner_id != '.') {
+        if (winner_id != '.' && loser_id != '.') {
+            players[string(1, winner_id)].wins++;
+            players[string(1, winner_id)].points += 3;
+            players[string(1, loser_id)].losses++;
+        } else if (winner_id != '.') {
             players[string(1, winner_id)].wins++;
             players[string(1, winner_id)].points += 3;
         } else if (loser_id != '.') {
             players[string(1, loser_id)].losses++;
         } else {
             for (auto& pair : players) {
-                if (pair.first != string(1, winner_id) && pair.first != string(1, loser_id)) {
-                    pair.second.draws++;
-                    pair.second.points++;
-                }
+                pair.second.draws++;
+                pair.second.points++;
             }
         }
     }
 }
+
 
 void show_table(const unordered_map<string, Player>& players) {
     cout << "ID\tSIGN\tWINS\tDRAWS\tLOSSES\tPOINTS" << endl;
