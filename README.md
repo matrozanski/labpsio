@@ -1,2 +1,2 @@
-# labpsio
-tictatoe
+# Symulacja tictactoe
+LAB PSIO
